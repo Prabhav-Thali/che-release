@@ -200,6 +200,7 @@ invokeAction() {
     
     #curl -sSL https://api.github.com/repos/${this_repo}/actions/workflows/${workflow_id}/dispatches -X POST -H "Authorization: token ${this_github_token}" -H "Accept: application/vnd.github.v3+json" -d "{\"ref\":\"${workflow_ref}\",\"inputs\": ${inputsJson} }" || die_with "[ERROR] Problem invoking action https://github.com/${this_repo}/actions?query=workflow%3A%22${this_action_name// /+}%22"
     echo "[INFO] Invoked '${this_action_name}' Travis job - see https://travis-ci.com/github/${Org}/${Repo}/builds"
+    date
 }
 
 releaseMachineExec() {
@@ -339,6 +340,7 @@ if [[ ${PHASES} == *"3"* ]] || [[ ${PHASES} == *"6"* ]]; then
   verifyContainerExistsWithTimeout ${REGISTRY}/${ORGANIZATION}/che-theia:${CHE_VERSION} 60
   verifyContainerExistsWithTimeout ${REGISTRY}/${ORGANIZATION}/che-theia-dev:${CHE_VERSION} 60
   verifyContainerExistsWithTimeout ${REGISTRY}/${ORGANIZATION}/che-theia-endpoint-runtime-binary:${CHE_VERSION} 60
+  date
 fi
 
 # Release plugin-registry (depends on che-theia and machine-exec)
