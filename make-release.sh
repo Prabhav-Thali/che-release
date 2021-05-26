@@ -119,33 +119,12 @@ evaluateCheVariables() {
     echo "Release Process Phases: '${PHASES}'"
 }
 
-# for a given GH repo and action name, compute workflow_id
-# warning: variable workflow_id is a global, so don't call this in parallel executions!
-computeWorkflowId() {
-    this_repo=$1
-    this_action_name=$2
-    workflow_id=$(curl -sSL https://api.github.com/repos/${this_repo}/actions/workflows -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.v3+json" | jq --arg search_field "${this_action_name}" '.workflows[] | select(.name == $search_field).id'); # echo "workflow_id = $workflow_id"
-    if [[ ! $workflow_id ]]; then
-        die_with "[ERROR] Could not compute workflow id from https://api.github.com/repos/${this_repo}/actions/workflows - check your GITHUB_TOKEN is active"
-    fi
-    # echo "[INFO] Got workflow_id $workflow_id for $this_repo action '$this_action_name'"
-}
-
 # generic method to call a GH action and pass in a single var=val parameter 
 invokeAction() {
     this_repo=$1
     this_action_name=$2
-    #this_workflow_id=$3
     #params is a comma-separated list of key=value entries
     this_params=$3
-
-    # if provided, use previously computed workflow_id; otherwise compute it from the action's name so we can invoke the GH action by id
-    #if [[ $this_workflow_id ]]; then
-        #workflow_id=$this_workflow_id
-    #else
-        #computeWorkflowId $this_repo "$this_action_name"
-        # now we have a global value for $workflow_id
-    #fi
 
     if [[ ${this_repo} == "devfile/devworkspace-operator" ]] || [[ ${this_repo} == "che-incubator/devworkspace-che-operator" ]] || [[ ${this_repo} == "Prabhav-Thali/che-machine-exec" ]] || [[ ${this_repo} == "eclipse-che/che-dashboard" ]] || [[ ${this_repo} == "eclipse-che/che-operator" ]];then
         WORKFLOW_MAIN_BRANCH="travis-s390x"
@@ -170,6 +149,15 @@ invokeAction() {
     # IFS=',' read -ra paramMap <<< "${this_params}"
     # for keyvalue in "${paramMap[@]}"
     # do 
+    #     key=${keyvalue%=*}
+    #     value=${keyvalue#*=}
+    #     echo $var1
+    #     inputsJson=$(echo "${inputsJson}" | jq ". + {\"${key}\": \"${value}\"}")
+    # done
+    # inputBody="[]"
+    # IFS=',' read -ra paramMap <<< "${this_params}"
+    # for keyvalue in "${paramMap[@]}"
+    # do
     #     key=${keyvalue%=*}
     #     value=${keyvalue#*=}
     #     echo $var1
@@ -219,7 +207,7 @@ releaseMachineExec() {
 }
 
 releaseCheTheia() {
-    invokeAction vibhutisawant/che-theia "Release Che Theia" "version=${CHE_VERSION}"
+    invokeAction Prabhav-Thali/che-theia "Release Che Theia" "version=${CHE_VERSION}"
 }
 
 releaseDevfileRegistry() {
