@@ -39,6 +39,7 @@ verifyContainerExistsWithTimeout()
     while [[ $count -le $timeout_intervals ]]; do # echo $count
         echo "       [$count/$timeout_intervals] Verify ${1} exists..." 
         # check if the container exists
+        date
         verifyContainerExists "$1"
         if [[ ${containerExists} -eq 1 ]]; then break; fi
         (( count=count+1 ))
